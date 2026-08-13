@@ -3,6 +3,8 @@ extends CanvasLayer
 const CELL_SIZE := 48.0
 const GRID_COLUMNS := 8
 const GRID_ROWS := 8
+const VIEWPORT_HEIGHT := 560.0
+const CONTENT_HEIGHT := 610.0
 
 var _root: Control
 var _stash_grid: Control
@@ -57,32 +59,38 @@ func _build_ui() -> void:
 
 	var hint := Label.new()
 	hint.position = Vector2(28, 52)
-	hint.text = "Hold TAB to inspect inventory   •   Drag the test item in the stash"
+	hint.text = "Hold TAB to inspect inventory   •   Mouse wheel scrolls each column   •   Drag the test item"
 	hint.modulate = Color(0.65, 0.68, 0.7)
 	_root.add_child(hint)
 
 	var body := HBoxContainer.new()
 	body.position = Vector2(28, 92)
-	body.size = Vector2(1224, 610)
+	body.size = Vector2(1224, VIEWPORT_HEIGHT)
 	body.add_theme_constant_override("separation", 18)
 	_root.add_child(body)
 
-	var equipment := _make_section("EQUIPMENT", Vector2(290, 610))
-	body.add_child(equipment)
-	_add_slot(equipment, "HEADWEAR", Vector2(20, 62), Vector2(115, 105))
-	_add_slot(equipment, "FACE COVER", Vector2(155, 62), Vector2(115, 105))
-	_add_slot(equipment, "BODY ARMOR", Vector2(20, 188), Vector2(250, 120))
-	_add_slot(equipment, "HOLSTER", Vector2(20, 330), Vector2(115, 170))
-	_add_slot(equipment, "ON SLING", Vector2(155, 330), Vector2(115, 170))
+	var equipment_scroll := _make_scroll_column(Vector2(290, VIEWPORT_HEIGHT))
+	body.add_child(equipment_scroll)
+	var equipment := _make_section("EQUIPMENT", Vector2(270, CONTENT_HEIGHT))
+	equipment_scroll.add_child(equipment)
+	_add_slot(equipment, "HEADWEAR", Vector2(20, 62), Vector2(105, 105))
+	_add_slot(equipment, "FACE COVER", Vector2(145, 62), Vector2(105, 105))
+	_add_slot(equipment, "BODY ARMOR", Vector2(20, 188), Vector2(230, 120))
+	_add_slot(equipment, "HOLSTER", Vector2(20, 330), Vector2(105, 170))
+	_add_slot(equipment, "ON SLING", Vector2(145, 330), Vector2(105, 170))
 
-	var carried := _make_section("CARRIED", Vector2(395, 610))
-	body.add_child(carried)
-	_add_slot(carried, "TACTICAL RIG", Vector2(20, 62), Vector2(355, 150))
-	_add_slot(carried, "POCKETS", Vector2(20, 232), Vector2(355, 90))
-	_add_slot(carried, "BACKPACK", Vector2(20, 342), Vector2(355, 220))
+	var carried_scroll := _make_scroll_column(Vector2(395, VIEWPORT_HEIGHT))
+	body.add_child(carried_scroll)
+	var carried := _make_section("CARRIED", Vector2(375, 720))
+	carried_scroll.add_child(carried)
+	_add_slot(carried, "TACTICAL RIG", Vector2(20, 62), Vector2(335, 150))
+	_add_slot(carried, "POCKETS", Vector2(20, 232), Vector2(335, 90))
+	_add_slot(carried, "BACKPACK", Vector2(20, 342), Vector2(335, 320))
 
-	var stash := _make_section("STASH", Vector2(500, 610))
-	body.add_child(stash)
+	var stash_scroll := _make_scroll_column(Vector2(500, VIEWPORT_HEIGHT))
+	body.add_child(stash_scroll)
+	var stash := _make_section("STASH", Vector2(480, CONTENT_HEIGHT))
+	stash_scroll.add_child(stash)
 
 	_stash_grid = Control.new()
 	_stash_grid.position = Vector2(20, 62)
@@ -112,6 +120,15 @@ func _build_ui() -> void:
 	item_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	item_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_drag_item.add_child(item_label)
+
+
+func _make_scroll_column(column_size: Vector2) -> ScrollContainer:
+	var scroll := ScrollContainer.new()
+	scroll.custom_minimum_size = column_size
+	scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	scroll.vertical_scroll_mode = ScrollContainer.SCROLL_MODE_AUTO
+	return scroll
 
 
 func _make_section(section_name: String, section_size: Vector2) -> Panel:
