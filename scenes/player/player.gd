@@ -34,6 +34,7 @@ extends CharacterBody3D
 @onready var camera_pitch: Node3D = $CameraYaw/CameraPitch
 @onready var camera_lean: Node3D = $CameraYaw/CameraPitch/CameraLean
 
+var input_locked := false
 var _pitch := deg_to_rad(-12.0)
 var _free_look_yaw := 0.0
 var _dash_time := 0.0
@@ -43,11 +44,21 @@ var _is_crouching := false
 
 
 func _ready() -> void:
+	add_to_group("player")
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
 	camera_pitch.rotation.x = _pitch
 
 
+func set_input_locked(value: bool) -> void:
+	input_locked = value
+	if input_locked:
+		_dash_time = 0.0
+
+
 func _unhandled_input(event: InputEvent) -> void:
+	if input_locked:
+		return
+
 	if event is InputEventKey and event.pressed and event.keycode == KEY_ESCAPE:
 		Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 		return
@@ -62,6 +73,15 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _physics_process(delta: float) -> void:
 	_update_timers(delta)
+
+	if input_locked:
+		if not is_on_floor():
+			velocity.y -= gravity * delta
+		velocity.x = move_toward(velocity.x, 0.0, acceleration * delta)
+		velocity.z = move_toward(velocity.z, 0.0, acceleration * delta)
+		move_and_slide()
+		return
+
 	_update_crouch(delta)
 	_update_lean(delta)
 
