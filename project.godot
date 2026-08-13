@@ -68,7 +68,7 @@ lean_left={
 }
 inventory={
 "deadzone": 0.5,
-"events": [Object(InputEventKey,"physical_keycode":4194308)]
+"events": [Object(InputEventKey,"physical_keycode":4194306)]
 }
 
 [physics]
