@@ -162,11 +162,11 @@ func _on_item_gui_input(event: InputEvent) -> void:
 		else:
 			_dragging = false
 			_snap_item_to_grid()
-		accept_event()
+		_drag_item.accept_event()
 	elif event is InputEventMouseMotion and _dragging:
 		_drag_item.position += event.relative
 		_clamp_item_to_grid()
-		accept_event()
+		_drag_item.accept_event()
 
 
 func _snap_item_to_grid() -> void:
